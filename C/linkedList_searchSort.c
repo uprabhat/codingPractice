@@ -110,11 +110,79 @@ void linkedListPrint(linkedList_t* myLL) {
   printf("\n");
 }
 //////////////////////////////////////////////////////////////////////////////////////////
+void nodeListMerge(node_t** nodeList,int l, int m, int r) {
+  node_t** inNodeList=(node_t**)malloc((1+r-l)*sizeof(node_t*));
+  int offset=l;
+  for(int i=l;i<=r;i++) {
+    *(inNodeList+i-offset)=*(nodeList+i);
+  }
+  int lPtr=0; //goes upto m-offset
+  int rPtr=m-offset+1; //goes upto r-offset
+  int outPtr=l;
+  while((lPtr<=m-offset)&&(rPtr<=r-offset)) {
+    if(((*(inNodeList+lPtr))->val)<((*(inNodeList+rPtr))->val)) {
+      *(nodeList+outPtr)=(*(inNodeList+lPtr));
+      lPtr+=1;
+    } else {
+      *(nodeList+outPtr)=(*(inNodeList+rPtr));
+      rPtr+=1;
+    }
+    outPtr+=1;
+  }
+  while(lPtr<=m-offset) {
+    *(nodeList+outPtr)=(*(inNodeList+lPtr));
+    lPtr+=1;
+    outPtr+=1;
+  }
+  while(rPtr<=r-offset) {
+    *(nodeList+outPtr)=(*(inNodeList+rPtr));
+    rPtr+=1;
+    outPtr+=1;
+  }
+  free(inNodeList);
+}
 
+void nodeListMergeSort(node_t** nodeList,int l, int r) {
+  if (r==l) {return;}
+  int m=l+((r-l)/2);
+  if(l!=m) {
+    nodeListMergeSort(nodeList,l,m);
+  }
+  if(r!=(m+1)) {
+    nodeListMergeSort(nodeList,m+1,r);
+  }
+  nodeListMerge(nodeList,l,m,r);
+}
+
+void linkedListMergeSort(linkedList_t* inLL) {
+  node_t* ptr=inLL->head;
+  node_t** nodeList=NULL;
+  int numNode=0;
+  while(ptr!=NULL) {
+    nodeList=(node_t**)realloc(nodeList,(1+numNode)*sizeof(node_t*));
+    *(nodeList+numNode)=ptr;
+    ptr=ptr->next;
+    numNode+=1;
+  }
+  /*for(int i=0;i<numNode;i++) {
+    printf("UTK>>>%p:%d\n",*(nodeList+i),(*(nodeList+i))->val);
+  }*/
+  nodeListMergeSort(nodeList,0,numNode-1);
+  inLL->head=*(nodeList);
+  int i=0;
+  while(i<(numNode-1)) {
+    (*(nodeList+i))->next=*(nodeList+i+1);
+    i+=1;
+  }
+  (*(nodeList+i))->next=NULL;
+  free(nodeList);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 int main(int argc, char **argv) {
   linkedList_t* myLL=linkedListInit();
   printf("UTK>>> Insert numbers>>>");
-  for(int i=0;i<6;i++) {
+  for(int i=0;i<(15);i++) {
     int r=rand()%10;
     printf("%d ",r);
     node_t* myN=nodeInit(r);
@@ -125,6 +193,10 @@ int main(int argc, char **argv) {
   node_t* myN=linkedListPop(myLL);
   printf("Popped value=%d\n",myN->val);
   nodeDel(myN);
+  linkedListPrint(myLL);
+  printf("Merge sorting linked-list\n");
+  linkedListMergeSort(myLL);
+  printf("Deleting linked-list\n");
   linkedListPrint(myLL);
   linkedListDel(myLL);
   return(0);
