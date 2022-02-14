@@ -1,0 +1,21 @@
+#make <target>
+#variables!
+CC=gcc
+CFLAGS=-Wall -c
+LFLAGS=-Wall
+#target:#depdendencies (order matters)
+########actions
+
+all: clean mainapp
+
+clean:
+	rm -vf a.out Hello.o tools.o
+
+mainapp: Hello.o tools.o
+	$(CC) $(LFLAGS) Hello.o tools.o -o mainapp
+
+Hello.o: Hello.c
+	$(CC) $(CFLAGS) Hello.c
+
+tools.o: Hello.c
+	$(CC) $(CFLAGS) tools.c

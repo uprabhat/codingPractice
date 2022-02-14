@@ -1,0 +1,23 @@
+#make <target>
+#variables!
+CC=gcc
+CFLAGS=-Wall -c
+LFLAGS=-Wall
+#target:#depdendencies (order matters)
+########actions
+
+all: clean mainapp
+
+clean:
+	rm -vf a.out Hello.o tools.o
+
+mainapp: Hello.o tools.o
+	echo ">>>Now finally generating $@ from $^"
+	$(CC) $(LFLAGS) $^ -o $@
+
+%.o: %.c
+	echo ">>>Compiling $^ to $@"
+	$(CC) $(CFLAGS) $^
+#
+# $@ name of the target
+# $^ dependencies for target
